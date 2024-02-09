@@ -586,7 +586,8 @@ class GRBLSer:
         "VER:ARM32 V2.2.20220826:",
         "OPT:VZL,35,254",
         """
-        return self.txrxs("$I")
+        return "VER:1.1f.20170801:", "OPT:PHS,15,128", "ok"  # Hash - Added for FluidNC support
+        # return self.txrxs("$I")
 
     def info(self):
         ver, opt = self.i()
@@ -1225,7 +1226,8 @@ class GRBL:
         return self.get_dollar_xyz_float("$130", "$131", "$132")
 
     def axes_max_rate(self):
-        return self.get_dollar_xyz_float("$110", "$111", "$112")
+        return {"x": 15.0, "y": 15.0, "z": 8.0} #Hash - This is needed due to scaling in my FLuidNC code
+        # return self.get_dollar_xyz_float("$110", "$111", "$112")
 
     def axes_max_acceleration(self):
         return self.get_dollar_xyz_float("$120", "$121", "$122")
@@ -1947,7 +1949,7 @@ def grbl_read_meta(gs):
         gcode, coords = l.split(":")
         # G54 => 1
         wcsn = int(gcode[1:]) - 53
-        gcode_coords[wcsn] = coords
+        gcode_coords[wcsn] = coords[:17]  #Hash - Only include coordinates from X,Y,Z if more axis exist.
     assert WCS_CONFIG in gcode_coords, "Failed to parse WCS"
     return parse_gcode_coords(gcode_coords)
 

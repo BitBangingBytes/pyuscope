@@ -1,0 +1,128 @@
+/*
+	Config file used with AmScope MU1803 camera and OpenFlexure Delta Stage.
+	Feb 9, 2024
+*/
+{
+    "kinematics": {
+        //2023-10-25: experimental
+        //Actual value might be higher but good enough for AF right now
+        "tsettle_autofocus": 0.3,
+        //2023-10-12: think 0.4 base isn't enough to fully settle vibration => increase slightly
+        //Maybe it always has to flush a frame => gives sync time?
+        "tsettle_motion_na1": 0.5,
+        "tsettle_motion_base": 0.4,
+        //2023-10-18: missed at 0.5
+        "tsettle_hdr": 0.6,
+    },
+
+    "motion": {
+        "hal": "grbl-ser",
+        //2023-10-12: there appear to be some settling effects that favor a large value for best regularity
+        //Might be order of magnitude 0.1 to 1.0 mm, at least on z
+        "limit_switches": false,
+        "backlash": 0.1,
+        "soft_limits": {
+            "xmin": -100.0,
+            //the machine is set to 300, but seems to crash at 285
+            "xmax": 100.0,
+            "ymin": -100.0,
+            //the machine is set to 200, but seems to crash at 180
+            "ymax": 100.0,
+            //hmm coordinate system mismatches
+            //had to disable machine vs soft limit check for now
+            //trip around -37.8
+            "zmin": -100.0,
+            "zmax": 5.0,
+        },
+
+        "max_home_time": 90,
+        /*
+        FIXME: were values saved before overwriting?
+        maybe take from the other genmitsu which should be similar
+        */
+        //"use_wcs_offsets": true,
+        "grbl": {
+            "rc_post_home": [
+                /*
+                //machine coordinate => 80 on z adjusted by 8/5
+                */
+                "G10 L2 P1 X0 Y0 Z+0.000",
+                "G10 L2 P2 X0 Y0 Z0",
+                //Select WCS2
+                "G55",
+                //Hack2: changing coordinate system resets tool (homing hack)
+                //https://github.com/Labsmore/pyuscope/issues/310
+                //If we get this far assume we are homed and persist this
+                "T1",
+            ]
+        },
+        "scalars": {
+            // This is used to flip direction of an axis or scale the value of movement
+            // for a given axis. Bottom left of image is 0,0. Moving Right and Up should
+            // lead to positive values in the interface, if not adjust here.
+            "x": 1.0,
+            "y": -1.0,
+            "z": 1.0,
+        },
+    },
+
+    "imager": {
+        "source":"gst-toupcamsrc",
+        //Find first device matching this name, used for AmScope camera (Toupcam)
+        "v4l2_name": "Hayear Camera: HY-800B",
+        "source_properties": {
+            "esize": 0
+        },
+        "native_width": 4912,
+        "native_height": 3684,
+        "native_pixel_pitch_um": 2.0,
+        "width": 4912,
+        "height": 3684,
+        "crop_pixels": {
+            "top": 0,
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+        },
+    },
+    "optics": {
+        //2.5x
+        //1280 * 4.125 = 5280
+        //"image_width_1x_mm": 5.280,
+        //2023-12-17: move from 2.5x to 1.5x after validating improved illuminator
+        //"image_width_1x_mm": 8.8,
+        //2023-12-18: move from 1.5x to 2.0x
+        //2.0x is still a lot more even until can add diffusor and/or improve FF correction
+        "image_width_1x_mm": 6.6,
+
+        //Quick guess, not calibrated
+        "diffusion": {
+            "red": 2.0,
+            "green": 2.0,
+            "blue": 4.0,
+        }
+    },
+    "ipp": {
+        "snapshot_correction": [
+            {"plugin": "correct-vm1v1", "dir": "vm1v1"},
+        ],
+        "plugins": {
+            "stack-enfuse": {
+                "align": true,
+            },
+        },
+    },
+    "systems": [
+        //Default configuration
+        {
+            "camera_sn": null,
+            "objectives_db": [
+                "vendor: LapSun, model: L Plan 5X",
+                "vendor: LapSun, model: L Plan 10X",
+                "vendor: LapSun, model: L Plan 20X",
+                "vendor: LapSun, model: L Plan 50X",                
+            ],
+        },
+    ],
+}
+
