@@ -4,12 +4,13 @@ ok
 
 Case insensitive best I can tell
 """
-
+import uscope.config
 from uscope.motion.hal import MotionHAL, MotionCritical
 from uscope import util
 from uscope.motion.motion_util import parse_move
 from uscope.util import tobytes, tostr
 from uscope.config import get_bc
+from uscope.config import get_delta_leveling  #Hash
 
 import termios
 import serial
@@ -281,7 +282,6 @@ class GRBLSer:
 
         self.verbose and print("opening %s in thread %s" %
                                (port, threading.get_ident()))
-
         # workaround for pyserial toggling flow control lines on open
         # Other the MCU will reboot on open
         # https://github.com/pyserial/pyserial/issues/124
@@ -364,13 +364,26 @@ class GRBLSer:
 
     def tx(self, out, nl=True):
         self.verbose and print("tx '%s'" % (out, ))
-
+        # print(out,type(out))
         if self.check_threads:
             if self.last_thread:
                 assert self.last_thread == threading.get_ident(), (
                     self.last_thread, threading.get_ident())
             else:
                 self.update_check_thread()
+
+        # Code to control leveling of Delta stage by controlling each
+        # motor individually.   # Hash
+        if uscope.config.get_delta_leveling():
+            if len(out) > 10 and out[7] == 'x':
+                modded_out = out[:7] + 'a' + out[8:]
+                out = modded_out
+            if len(out) > 10 and out[7] == 'y':
+                modded_out = out[:7] + 'b' + out[8:]
+                out = modded_out
+            if len(out) > 10 and out[7] == 'z':
+                modded_out = out[:7] + 'c' + out[8:]
+                out = modded_out
 
         if nl:
             out = out + '\r'
@@ -1872,7 +1885,6 @@ def grbl_write_meta(gs, config=None, sn=None, comment=None):
     write_wcs_packed(gs, WCS_COMMENT, wcs_pad_str(comment))
     write_wcs_packed(gs, WCS_SN, wcs_pad_str(sn))
     write_wcs_packed(gs, WCS_CONFIG, config)
-
 
 def parse_gcode_coords(gcode_coords):
     # WARNING: this format loses LSB sometimes

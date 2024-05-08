@@ -1255,6 +1255,10 @@ class TopMotionWidget(AWidget):
 
         self.axis_map = {
             # Upper left origin
+            # Qt.Key_A: ("a", -1),
+            # Qt.Key_D: ("a", 1),
+            # Qt.Key_S: ("b", -1),
+            # Qt.Key_W: ("b", 1),
             Qt.Key_A: ("x", -1),
             Qt.Key_D: ("x", 1),
             Qt.Key_S: ("y", -1),
@@ -1262,6 +1266,8 @@ class TopMotionWidget(AWidget):
         }
         if self.ac.microscope.has_z():
             self.axis_map.update({
+                # Qt.Key_Q: ("c", -1),
+                # Qt.Key_E: ("c", 1),
                 Qt.Key_Q: ("z", -1),
                 Qt.Key_E: ("z", 1),
             })
@@ -1419,6 +1425,11 @@ class TopMotionWidget(AWidget):
             )
             jogs[axis] = jog_val
 
+        # Hash tests to see if we can send abc to replace xyz commands
+        # print("widgets:update_jogging:jogs: ",jogs)
+        # jog_individual_motor = dict(a = jogs['x'], b = jogs['y'], c = jogs['z'])
+        # jogs = jog_individual_motor
+
         self.jog_controller.update(jogs)
         self.jog_last_presses = {}
 
@@ -1449,6 +1460,12 @@ class TopWidget(AWidget):
             self.autofocus_pb.clicked.connect(self.autofocus_pushed)
             layout.addWidget(self.autofocus_pb)
 
+            self.delta_leveling_pb = QPushButton("Level Delta Stage")
+            self.delta_leveling_pb.clicked.connect(self.delta_leveling_pushed)
+            self.delta_leveling_pb.setCheckable(True)
+            self.delta_leveling_pb.setStyleSheet("QPushButton:checked { background-color: red; }")
+            layout.addWidget(self.delta_leveling_pb)
+
             return layout
 
         layout.addLayout(right_layout())
@@ -1461,6 +1478,9 @@ class TopWidget(AWidget):
 
     def autofocus_pushed(self):
         self.ac.image_processing_thread.auto_focus(self.ac.objective_config())
+
+    def delta_leveling_pushed(self):
+        config.set_delta_leveling(not config.get_delta_leveling())
 
     def _poll_misc(self):
         last_pos = self.ac.motion_thread.pos_cache

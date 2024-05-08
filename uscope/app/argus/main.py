@@ -25,7 +25,6 @@ from uscope.gui.widgets import TopWidget, BatchImageTab, AdvancedTab, StitchingT
 from uscope.gui.imaging import MainTab, ImagerTab
 from uscope.gui.scripting import ScriptingTab
 
-
 # Can't save a dict like {(1, 2): "a"}
 def tupledict_to_json(j):
     # {(1, 2): "a"} => [((1, 2), "a")]
@@ -47,7 +46,6 @@ class ArgusOptionsWindow(QWidget):
 
     def initUI(self):
         layout = QVBoxLayout()
-
         def motion_gb():
             layout = QGridLayout()
             row = 0
@@ -166,7 +164,7 @@ class FullscreenVideo(QWidget):
         widget.setSizePolicy(policy)
         layout.setAlignment(Qt.AlignCenter)
         self.setLayout(layout)
-        self.showMaximized()
+        # self.showMaximized()  #Hash Removed
 
     def closeEvent(self, event):
         self.closing.emit()
@@ -195,7 +193,8 @@ class MainWindow(AMainWindow):
         self.show()
 
         # sometimes GUI maximization doesn't stick
-        self.showMaximized()
+        # self.showMaximized()  #Hash removed
+        delta_leveling = False
 
     def _cache_load(self, j):
         j = j.get("main_window", {})
@@ -398,7 +397,8 @@ class MainWindow(AMainWindow):
         self.central_widget.setLayout(layout)
         self.setCentralWidget(self.central_widget)
         self.createMenuBar()
-        self.showMaximized()
+        # self.showMaximized()  #Hash Removed
+        self.setFixedSize(1920, 1080)
 
     def _poll_misc(self):
         pass

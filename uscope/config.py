@@ -43,11 +43,20 @@ defaults = {
 # microscope.j5
 usj = None
 usc = None
+delta_leveling = False  #Hash
 """
 Calibration broken out into separate file to allow for easier/safer frequent updates
 Ideally we'd also match on S/N or something like that
 """
 
+#Hash
+def set_delta_leveling(mode):
+    global delta_leveling
+    delta_leveling = mode
+
+def get_delta_leveling():
+    global delta_leveling
+    return delta_leveling
 
 def find_panotools_exe(config, configk, exe_name, flatpak_name):
     exe = config.get(configk)
