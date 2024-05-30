@@ -183,6 +183,9 @@ class StackEnfusePlugin(IPPlugin):
             args = list(self.align_image_stack) + [
                 # is there a reason to use -i vs -x -y?
                 # -x -y is more explicit, let's do that for now
+                "--gpu",  #Hash Test
+                # "-z",  #Hash - Causes screwed up images occasionally
+                "-t 15",  #Hash - DRASTICALLY improves focus stacking results 05/26/2024 (was -t 8)
                 "-l",
                 "-x",
                 "-y",
