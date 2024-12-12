@@ -398,7 +398,8 @@ class MainWindow(AMainWindow):
         self.setCentralWidget(self.central_widget)
         self.createMenuBar()
         # self.showMaximized()  #Hash Removed
-        self.setFixedSize(1920, 1080)
+        # self.setFixedSize(1920, 1080) #Hash Test, this locks window size
+        self.resize(1920, 1080)
 
     def _poll_misc(self):
         pass
